@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX 100
+
+bool subsetSum(int set[], int n, int sum, int targetSum, int index, bool subset[MAX]) {
+    if (sum == targetSum)
+        return true;
+    if (index >= n || sum > targetSum)
+        return false;
+
+    subset[index] = true;
+    if (subsetSum(set, n, sum + set[index], targetSum, index + 1, subset))
+        return true;
+
+    subset[index] = false;
+    return subsetSum(set, n, sum, targetSum, index + 1, subset);
+}
+
+int main() {
+    int set[] = {10, 7, 5, 18, 12, 20, 15};
+    int n = sizeof(set) / sizeof(set[0]);
+    int targetSum = 35;
+    bool subset[MAX] = {false};
+
+    if (subsetSum(set, n, 0, targetSum, 0, subset)) {
+        printf("Subset with the given sum exists: ");
+        for (int i = 0; i < n; i++) {
+            if (subset[i])
+                printf("%d ", set[i]);
+        }
+        printf("\n");
+    } else {
+        printf("No subset with the given sum exists.\n");
+    }
+
+    return 0;
+}
