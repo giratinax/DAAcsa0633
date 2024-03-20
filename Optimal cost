@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <limits.h>
+
+#define V 4 // Number of vertices (cities)
+
+// Function to find the minimum of two integers
+int min(int x, int y) {
+    return (x < y) ? x : y;
+}
+
+// Function to find the optimal cost of traveling using dynamic programming
+int tsp(int graph[][V], int mask, int pos, int dp[][V]) {
+    // If all cities have been visited
+    if (mask == (1 << V) - 1) {
+        return graph[pos][0];
+    }
+
+    // If subproblem has already been computed
+    if (dp[mask][pos] != -1) {
+        return dp[mask][pos];
+    }
+
+    int ans = INT_MAX;
+
+    // Try to go to each city not visited yet
+    for (int i = 0; i < V; i++) {
+        if (!(mask & (1 << i))) { // If city i has not been visited
+            int newAns = graph[pos][i] + tsp(graph, mask | (1 << i), i, dp);
+            ans = min(ans, newAns);
+        }
+    }
+
+    // Memoization
+    return dp[mask][pos] = ans;
+}
+
+int main() {
+    int graph[V][V] = {
+        {0, 10, 15, 20},
+        {10, 0, 35, 25},
+        {15, 35, 0, 30},
+        {20, 25, 30, 0}
+    };
+
+    // dp[i][j] stores the minimum cost to visit all cities in mask i and end at city j
+    int dp[1 << V][V];
+    for (int i = 0; i < (1 << V); i++) {
+        for (int j = 0; j < V; j++) {
+            dp[i][j] = -1;
+        }
+    }
+
+    // Start at city 0
+    int optimalCost = tsp(graph, 1, 0, dp);
+
+    printf("The optimal cost for traveling salesman problem is: %d\n", optimalCost);
+
+    return 0;
+}
