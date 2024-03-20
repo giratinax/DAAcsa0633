@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <limits.h>
+
+// Function to find minimum of two values
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
+// Function to calculate sum of frequencies from i to j (inclusive)
+int sum(int freq[], int i, int j) {
+    int s = 0;
+    for (int k = i; k <= j; k++)
+        s += freq[k];
+    return s;
+}
+
+// Function to find the optimal cost of a binary search tree
+int optimalSearchTree(int keys[], int freq[], int n) {
+    // Create a 2D table to store costs of subproblems
+    int cost[n][n];
+
+    // Initialize diagonal elements (single keys)
+    for (int i = 0; i < n; i++)
+        cost[i][i] = freq[i];
+
+    // Process lengths 2 to n
+    for (int length = 2; length <= n; length++) {
+        // Consider all segments of length 'length'
+        for (int i = 0; i <= n - length + 1; i++) {
+            int j = i + length - 1;
+            cost[i][j] = INT_MAX;
+
+            // Try making all keys in interval keys[i..j] as root
+            for (int r = i; r <= j; r++) {
+                // Cost when keys[r] becomes root of this subtree
+                int c = ((r > i) ? cost[i][r - 1] : 0) +
+                        ((r < j) ? cost[r + 1][j] : 0) +
+                        sum(freq, i, j);
+                cost[i][j] = min(cost[i][j], c);
+            }
+        }
+    }
+
+    return cost[0][n - 1];
+}
+
+int main() {
+    int keys[] = {10, 12, 20};
+    int freq[] = {34, 8, 50};
+    int n = sizeof(keys) / sizeof(keys[0]);
+
+    printf("Cost of optimal binary search tree is: %d\n", optimalSearchTree(keys, freq, n));
+
+    return 0;
+}
